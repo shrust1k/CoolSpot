@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2>CoolSpot</h2>
+    <form id="createBlog" action="" style="width:50vw; display: flex; flex-direction: column;">
+        <label required  for="title">title</label>
+        <input type="text" name="title" id="title">
+        <textarea style="resize: none;" required name="text" cols="30" rows="10"></textarea>
+        <label for="author">author</label>
+        <input required type="text" name="author" id="author">
+        <button type="submit">Post</button>
+    </form>
+    <div id="feed"></div>
+    
+
+    <script>
+        let feed = document.getElementById("feed")
+        fetch('/api/blogs')
+        .then((res) => {
+            return res.json()
+        })
+        .then((data) => {
+            data.forEach(element => {
+                renderBlog(element)
+            });
+        })
+
+        function renderBlog(objBlog) {
+            const title = objBlog.title;
+            const text = objBlog.text;
+            const author = objBlog.author;
+
+            const template = `
+            <div >
+                <h4> ${title} </h4>
+                <p> ${text} </p>
+                <span> @${author} </span>
+            </div>
+            `;
+
+            feed.innerHTML += template;
+        }
+
+
+        const form = document.getElementById('createBlog')
+        form.addEventListener('submit', (e) => {
+            const data = new FormData(e.target)
+            const title = data.get('title');
+            const text = data.get('text');
+            const author = data.get("author");
+
+            const dataObj = {
+                title,
+                text,
+                author
+            }
+
+            fetch('/api/blogs',  {
+                method: 'POST',
+                headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(dataObj)
+            })
+                        
+        })
+
+    </script>
+</body>
+</html>
